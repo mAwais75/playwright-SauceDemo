@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../Pages/LoginPage'
 import { ProductsPage } from '../Pages/ProductsPage'
 import { CartPage } from '../Pages/CartPage'
-import { CheckoutPage } from '../pages/CheckoutPage';
+import { CheckoutPage } from '../Pages/CheckoutPage';
 
 test('Add to Cart with Complete Checkout Flow', async ({ page }) => {
   const loginPage = new LoginPage(page);
