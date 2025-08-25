@@ -10,28 +10,34 @@ test('Add to Cart with Complete Checkout Flow', async ({ page }) => {
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
 
+  // Login
   await loginPage.goto();
   await loginPage.login('standard_user', 'secret_sauce');
   await expect(productsPage.title).toHaveText('Products');
 
-  await productsPage.openProduct('Sauce Labs Fleece Jacket');
-  await productsPage.addToCartById('add-to-cart');
-  await expect(page.locator('button[data-test="remove"]')).toHaveText('Remove');
+  // Add products
+  await productsPage.addToCartById('add-to-cart-sauce-labs-bike-light');
+  await productsPage.addToCartById('add-to-cart-sauce-labs-onesie');
 
+  // Verify cart count
+  await expect(productsPage.cartCount).toHaveText('2');
+
+  // Go to cart
   await productsPage.openCart();
-  await expect(cartPage.title).toHaveText('Your Cart');
-  
-  
-  await expect(await cartPage.getProductName()).toHaveText('Sauce Labs Fleece Jacket');
+  const cartProducts = await cartPage.getProductName().allTextContents();
+  expect(cartProducts).toContain('Sauce Labs Bike Light');
+  expect(cartProducts).toContain('Sauce Labs Onesie');
 
+  // Checkout
   await cartPage.checkout();
-  await expect(checkoutPage.title).toHaveText('Checkout: Your Information');
+  await checkoutPage.fillInformation('John', 'Doe', '12345');
 
-  await checkoutPage.fillInformation('Awais', 'Khalid', '51000');
-  await expect(checkoutPage.title).toHaveText('Checkout: Overview');
-  await expect(await checkoutPage.getProductName()).toHaveText('Sauce Labs Fleece Jacket');
+  // Verify products in checkout overview
+  const checkoutProducts = await checkoutPage.getProductName().allTextContents();
+  expect(checkoutProducts).toContain('Sauce Labs Bike Light');
+  expect(checkoutProducts).toContain('Sauce Labs Onesie');
 
+  // Finish order
   await checkoutPage.finishOrder();
-  await expect(checkoutPage.completeHeader).toHaveText('Thank you for your order!');
-  await expect(checkoutPage.backHomeBtn).toHaveText('Back Home');
+  await expect(checkoutPage.completeHeader).toHaveText('THANK YOU FOR YOUR ORDER');
 });

@@ -14,14 +14,21 @@ test.describe('Login Feature - DDT', () => {
       await loginPage.usernameInput.waitFor({ state: 'visible' });
       await loginPage.login(data.username, data.password);
 
+      //Success Scenario with Corresponding Assertions
       if (data.expected === 'success') {
         await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
         await expect(productsPage.title).toHaveText('Products');
-      } else if (data.expected === 'locked') {
+      } 
+      
+      //Locked Scenario with Corresponding Assertions
+      else if (data.expected === 'locked') {
         await expect(await loginPage.getErrorMessage()).toHaveText(
           'Epic sadface: Sorry, this user has been locked out.'
         );
-      } else if (data.expected === 'invalid') {
+      } 
+      
+      //Invalid Password Scenario with Corresponding Assertions
+      else if (data.expected === 'invalid') {
         await expect(await loginPage.getErrorMessage()).toHaveText(
           'Epic sadface: Username and password do not match any user in this service'
         );
