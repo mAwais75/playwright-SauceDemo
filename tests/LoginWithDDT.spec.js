@@ -10,6 +10,8 @@ test.describe('Login Feature - DDT', () => {
       const productsPage = new ProductsPage(page);
 
       await loginPage.goto();
+      // Wait for username input to be visible
+      await loginPage.usernameInput.waitFor({ state: 'visible' });
       await loginPage.login(data.username, data.password);
 
       if (data.expected === 'success') {
