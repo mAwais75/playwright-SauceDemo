@@ -10,34 +10,36 @@ test('Add to Cart with Complete Checkout Flow', async ({ page }) => {
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
 
-  // Login
+  //Visitng the page with correct credentials and assertion to verify that we landed on the right page
   await loginPage.goto();
   await loginPage.login('standard_user', 'secret_sauce');
   await expect(productsPage.title).toHaveText('Products');
 
-  // Add products
-  await productsPage.addToCartById('add-to-cart-sauce-labs-bike-light');
-  await productsPage.addToCartById('add-to-cart-sauce-labs-onesie');
+  //Selecting the and clicking the product i.e. Sauce Labs Fleece Jacket
+  //Adding the product to the cart
+  //Assertion to verify that the corresponding product has been added to the cart 
+  await productsPage.openProduct('Sauce Labs Fleece Jacket');
+  await productsPage.addToCartById('add-to-cart');
+  await expect(page.locator('button[data-test="remove"]')).toHaveText('Remove');
 
-  // Verify cart count
-  await expect(productsPage.cartCount).toHaveText('2');
-
-  // Go to cart
+  //Open the cart and assertion to verify the cart has been opened
   await productsPage.openCart();
-  const cartProducts = await cartPage.getProductName().allTextContents();
-  expect(cartProducts).toContain('Sauce Labs Bike Light');
-  expect(cartProducts).toContain('Sauce Labs Onesie');
+  await expect(cartPage.title).toHaveText('Your Cart');
+  
+  //Assertion for the selected product name
+  await expect(await cartPage.getProductName()).toHaveText('Sauce Labs Fleece Jacket');
 
-  // Checkout
+  //Checkout and the corresponding assertion
   await cartPage.checkout();
-  await checkoutPage.fillInformation('John', 'Doe', '12345');
+  await expect(checkoutPage.title).toHaveText('Checkout: Your Information');
 
-  // Verify products in checkout overview
-  const checkoutProducts = await checkoutPage.getProductName().allTextContents();
-  expect(checkoutProducts).toContain('Sauce Labs Bike Light');
-  expect(checkoutProducts).toContain('Sauce Labs Onesie');
+  //Fill in the checkout information and the relevant assertion 
+  await checkoutPage.fillInformation('Awais', 'Khalid', '51000');
+  await expect(checkoutPage.title).toHaveText('Checkout: Overview');
+  await expect(await checkoutPage.getProductName()).toHaveText('Sauce Labs Fleece Jacket');
 
-  // Finish order
+  //Finish the order and assertion to verify that the order has been placed successfully 
   await checkoutPage.finishOrder();
-  await expect(checkoutPage.completeHeader).toHaveText('THANK YOU FOR YOUR ORDER');
+  await expect(checkoutPage.completeHeader).toHaveText('Thank you for your order!');
+  await expect(checkoutPage.backHomeBtn).toHaveText('Back Home');
 });
