@@ -32,7 +32,7 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # Step 5: Run Playwright tests
+      # Step 5: Run Playwright tests for current browser
       - name: Run Playwright tests
         run: npx playwright test --project ${{ matrix.browser }} --reporter=monocart-reporter,html,list
 
@@ -49,41 +49,3 @@ jobs:
         with:
           name: html-report-${{ matrix.browser }}
           path: playwright-report
-
-  combine-reports:
-  runs-on: ubuntu-latest
-  needs: test
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Download Chromium Monocart
-      uses: actions/download-artifact@v4
-      with:
-        name: monocart-report-chromium
-        path: combined-monocart
-
-    - name: Download Firefox Monocart
-      uses: actions/download-artifact@v4
-      with:
-        name: monocart-report-firefox
-        path: combined-monocart
-
-    - name: Download WebKit Monocart
-      uses: actions/download-artifact@v4
-      with:
-        name: monocart-report-webkit
-        path: combined-monocart
-
-    - name: Merge Monocart reports
-      run: |
-        mkdir -p combined-monocart/final
-        for dir in combined-monocart/*; do
-          cp -r "$dir"/* combined-monocart/final/
-        done
-
-    - name: Upload combined Monocart report
-      uses: actions/upload-artifact@v4
-      with:
-        name: monocart-report-combined
-        path: combined-monocart/final
