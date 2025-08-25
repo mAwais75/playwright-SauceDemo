@@ -14,31 +14,38 @@ jobs:
         browser: [chromium, firefox, webkit]
 
     steps:
-      - name: Checkout code
+      # Step 1: Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # Step 4: Install Playwright browsers
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      # Step 5: Run Playwright tests for current browser
       - name: Run Playwright tests
         run: npx playwright test --project ${{ matrix.browser }} --reporter=monocart-reporter,html,list
 
+      # Step 6: Upload Monocart report
       - name: Upload Monocart report
-        uses: actions/upload-artifact@v4.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: monocart-report-${{ matrix.browser }}
           path: monocart-report
 
+      # Step 7: Upload HTML report
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: html-report-${{ matrix.browser }}
           path: playwright-report
