@@ -1,4 +1,4 @@
-name: Playwright Tests CI
+name: Playwright Tests CI/CD
 
 on:
   push:
@@ -9,33 +9,36 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
-    - name: Run Playwright tests
-      run: npx playwright test --reporter=monocart-reporter,html,list
+      - name: Run Playwright tests
+        run: npx playwright test --project ${{ matrix.browser }} --reporter=monocart-reporter,html,list
 
-    - name: Upload Monocart Report
-      uses: actions/upload-artifact@v3
-      with:
-        name: monocart-report
-        path: monocart-report
+      - name: Upload Monocart report
+        uses: actions/upload-artifact@v4
+        with:
+          name: monocart-report-${{ matrix.browser }}
+          path: monocart-report
 
-    - name: Upload HTML Report
-      uses: actions/upload-artifact@v3
-      with:
-        name: html-report
-        path: playwright-report
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-${{ matrix.browser }}
+          path: playwright-report
